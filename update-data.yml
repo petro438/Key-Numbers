@@ -1,0 +1,39 @@
+name: Update NFL Data
+
+on:
+  # Run every Tuesday at 13:00 UTC (~ 8am ET, after Monday Night Football is final)
+  schedule:
+    - cron: '0 13 * * 2'
+  # Allow manual triggering from the Actions tab
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run build script
+        run: python build.py
+
+      - name: Commit and push if data changed
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if [[ -n "$(git status --porcelain index.html games_data.json)" ]]; then
+            git add index.html games_data.json
+            git commit -m "Auto-update NFL data ($(date -u '+%Y-%m-%d'))"
+            git push
+            echo "Updated."
+          else
+            echo "No changes."
+          fi

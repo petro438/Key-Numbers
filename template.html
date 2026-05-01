@@ -1,0 +1,1279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NFL Key Numbers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green: #00c358;
+    --green-dim: #008f40;
+    --green-faint: rgba(0, 195, 88, 0.12);
+    --bg: #0c0e12;
+    --bg-soft: #14171d;
+    --rule: #1f2530;
+    --rule-soft: #181c24;
+    --text: #e8ecf3;
+    --muted: #7c8595;
+    --muted-2: #4f5868;
+    --bar-base: #2a3140;
+    --period-a: #00c358;
+    --period-b: #6b8cff;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: "ss01", "cv11";
+  }
+  .num { font-variant-numeric: tabular-nums; }
+  .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+
+  .wrap {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 28px 28px 56px;
+  }
+
+  /* ============ HEADER ============ */
+  header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 22px;
+  }
+  h1 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  h1 .accent { color: var(--green); font-weight: 700; }
+  .sub {
+    color: var(--muted);
+    font-size: 12px;
+    margin-top: 4px;
+    font-weight: 400;
+  }
+  .meta {
+    color: var(--muted);
+    font-size: 11px;
+    text-align: right;
+    line-height: 1.6;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 500;
+  }
+  .meta b { color: var(--text); font-weight: 600; }
+
+  /* ============ FILTERS — flat, no card ============ */
+  .filters {
+    display: grid;
+    grid-template-columns: 1.2fr 1.2fr 0.7fr 0.9fr;
+    gap: 28px;
+    padding: 4px 0 18px;
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 22px;
+  }
+  @media (max-width: 980px) {
+    .filters { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 600px) {
+    .filters { grid-template-columns: 1fr; gap: 18px; }
+  }
+  .filter-group .label {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin-bottom: 10px;
+    font-weight: 600;
+  }
+  .filter-group .label .val {
+    color: var(--text);
+    font-size: 12px;
+    text-transform: none;
+    letter-spacing: 0;
+    font-weight: 500;
+    font-family: 'JetBrains Mono', monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Dual-handle range slider */
+  .range-slider {
+    position: relative;
+    height: 28px;
+  }
+  .range-slider .track {
+    position: absolute;
+    top: 12px;
+    left: 0; right: 0;
+    height: 2px;
+    background: var(--rule);
+  }
+  .range-slider .fill {
+    position: absolute;
+    top: 12px;
+    height: 2px;
+    background: var(--green);
+  }
+  .range-slider input[type=range] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 28px;
+    background: transparent;
+    pointer-events: none;
+    -webkit-appearance: none;
+    appearance: none;
+    margin: 0;
+  }
+  .range-slider input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 2px solid var(--green);
+    cursor: pointer;
+    pointer-events: auto;
+    transition: transform 0.1s;
+  }
+  .range-slider input[type=range]::-webkit-slider-thumb:hover {
+    transform: scale(1.15);
+  }
+  .range-slider input[type=range]::-moz-range-thumb {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 2px solid var(--green);
+    cursor: pointer;
+    pointer-events: auto;
+  }
+
+  /* Toggle pills — flat, underline style */
+  .pills {
+    display: flex;
+    gap: 18px;
+    height: 28px;
+    align-items: center;
+  }
+  .pills button {
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    padding: 4px 0;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+    border-bottom: 1.5px solid transparent;
+    transition: color 0.12s, border-color 0.12s;
+  }
+  .pills button:hover { color: var(--text); }
+  .pills button.active {
+    color: var(--text);
+    border-bottom-color: var(--green);
+  }
+
+  /* Compare toggle (for period mode) */
+  .compare-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: 28px;
+    color: var(--muted);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+    cursor: pointer;
+    user-select: none;
+  }
+  .compare-toggle .switch {
+    position: relative;
+    width: 32px;
+    height: 18px;
+    background: var(--rule);
+    border-radius: 9px;
+    transition: background 0.15s;
+  }
+  .compare-toggle .switch::after {
+    content: '';
+    position: absolute;
+    top: 2px; left: 2px;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: var(--muted);
+    transition: transform 0.15s, background 0.15s;
+  }
+  .compare-toggle.on .switch { background: var(--green-faint); }
+  .compare-toggle.on .switch::after {
+    transform: translateX(14px);
+    background: var(--green);
+  }
+  .compare-toggle.on { color: var(--text); }
+
+  /* ============ VIEW TABS ============ */
+  .view-tabs {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 24px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .view-tabs button {
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    padding: 0 0 12px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: all 0.12s;
+    letter-spacing: -0.005em;
+  }
+  .view-tabs button:hover { color: var(--text); }
+  .view-tabs button.active {
+    color: var(--text);
+    border-bottom-color: var(--green);
+    font-weight: 600;
+  }
+
+  /* ============ STATS — borderless, tabular ============ */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    padding: 4px 0 24px;
+    margin-bottom: 8px;
+  }
+  @media (max-width: 720px) {
+    .stats { grid-template-columns: repeat(2, 1fr); gap: 18px 0; }
+  }
+  .stat {
+    padding: 0 24px;
+    border-left: 1px solid var(--rule);
+  }
+  .stat:first-child { padding-left: 0; border-left: none; }
+  @media (max-width: 720px) {
+    .stat { padding: 0 12px; }
+    .stat:nth-child(odd) { padding-left: 0; border-left: none; }
+  }
+  .stat-label {
+    color: var(--muted);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .stat-value {
+    font-size: 22px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.015em;
+    line-height: 1.1;
+  }
+  .stat-value .pct {
+    color: var(--green);
+    font-size: 13px;
+    font-weight: 500;
+    margin-left: 8px;
+    letter-spacing: 0;
+  }
+  .stat-row-2 {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .stat-row-2 .stat-line {
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.2;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+  }
+  .stat-row-2 .stat-line .lbl {
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .stat-row-2 .stat-line .val { font-variant-numeric: tabular-nums; }
+
+  /* ============ LAYOUT ============ */
+  .layout {
+    display: grid;
+    grid-template-columns: 1fr 240px;
+    gap: 36px;
+  }
+  @media (max-width: 980px) {
+    .layout { grid-template-columns: 1fr; gap: 28px; }
+  }
+
+  /* ============ CHART AREA ============ */
+  .chart-section {
+    min-width: 0;
+  }
+  .chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 4px;
+  }
+  .chart-title {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: -0.005em;
+  }
+  .chart-sub {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 500;
+  }
+  .legend {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+    margin-top: 8px;
+  }
+  .legend .item { display: inline-flex; align-items: center; gap: 6px; }
+  .legend .swatch {
+    width: 10px; height: 10px;
+    display: inline-block;
+    border-radius: 1px;
+  }
+
+  .chart-wrap {
+    width: 100%;
+    overflow-x: auto;
+    position: relative;
+    margin-top: 14px;
+  }
+  svg.chart {
+    display: block;
+    width: 100%;
+    min-width: 700px;
+    height: 460px;
+  }
+
+  /* SVG element styles */
+  .bar { transition: opacity 0.12s; cursor: pointer; }
+  .bar:hover { opacity: 0.78; }
+  .bar-label {
+    font-size: 10px;
+    fill: var(--text);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    pointer-events: none;
+    font-family: 'Inter', sans-serif;
+  }
+  .axis-label {
+    font-size: 10px;
+    fill: var(--muted);
+    font-variant-numeric: tabular-nums;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+  }
+  .axis-label.key {
+    fill: var(--text);
+    font-weight: 700;
+  }
+  .axis-title {
+    font-size: 9px;
+    fill: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+  }
+  .grid-line { stroke: var(--rule-soft); stroke-width: 1; }
+  .grid-line.zero { stroke: var(--rule); }
+
+  /* Tooltip */
+  .tooltip {
+    position: absolute;
+    pointer-events: none;
+    background: var(--bg);
+    border: 1px solid var(--green);
+    padding: 10px 12px;
+    font-size: 11px;
+    color: var(--text);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    opacity: 0;
+    transition: opacity 0.1s;
+    z-index: 10;
+    white-space: nowrap;
+    font-family: 'Inter', sans-serif;
+  }
+  .tooltip.visible { opacity: 1; }
+  .tooltip .tt-num {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--green);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+    margin-bottom: 4px;
+  }
+  .tooltip .tt-row {
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+    font-size: 11px;
+    line-height: 1.5;
+  }
+  .tooltip .tt-row b { color: var(--text); font-weight: 600; }
+  .tooltip hr {
+    border: none;
+    border-top: 1px solid var(--rule);
+    margin: 6px 0;
+  }
+  .tooltip .tt-period-tag {
+    display: inline-block;
+    width: 8px; height: 8px;
+    margin-right: 5px;
+    vertical-align: 1px;
+  }
+
+  /* ============ TOP LIST — DataGolf inline style ============ */
+  .top-list {
+    padding-top: 0;
+  }
+  .top-list h3 {
+    margin: 0 0 12px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+  }
+  .top-row {
+    display: grid;
+    grid-template-columns: 18px 28px 1fr 50px;
+    align-items: center;
+    column-gap: 10px;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--rule-soft);
+    font-variant-numeric: tabular-nums;
+    font-size: 12px;
+  }
+  .top-row:last-child { border-bottom: none; }
+  .top-rank {
+    color: var(--muted-2);
+    font-size: 10px;
+    font-weight: 500;
+  }
+  .top-num {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .top-mini-bar {
+    height: 6px;
+    background: var(--bar-base);
+    position: relative;
+    overflow: hidden;
+  }
+  .top-mini-bar-fill {
+    position: absolute;
+    top: 0; left: 0;
+    height: 100%;
+    background: var(--green);
+  }
+  .top-pct {
+    color: var(--text);
+    font-size: 11px;
+    font-weight: 500;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Period comparison row variant */
+  .top-row.cmp {
+    grid-template-columns: 18px 28px 1fr 1fr;
+  }
+  .top-row.cmp .top-mini-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .top-row.cmp .top-mini-stack .mini-line {
+    display: grid;
+    grid-template-columns: 1fr 32px;
+    gap: 8px;
+    align-items: center;
+  }
+  .top-row.cmp .top-mini-stack .mini-line .lbl {
+    height: 4px;
+    background: var(--bar-base);
+    position: relative;
+  }
+  .top-row.cmp .top-mini-stack .mini-line .lbl span {
+    position: absolute;
+    top: 0; left: 0;
+    height: 100%;
+  }
+  .top-row.cmp .top-mini-stack .mini-line .val {
+    font-size: 10px;
+    color: var(--muted);
+    text-align: right;
+    font-weight: 500;
+  }
+  .top-row.cmp .top-mini-stack .mini-line.a .val { color: var(--period-a); }
+  .top-row.cmp .top-mini-stack .mini-line.b .val { color: var(--period-b); }
+
+  .footer-note {
+    margin-top: 32px;
+    padding-top: 20px;
+    border-top: 1px solid var(--rule);
+    color: var(--muted-2);
+    font-size: 10px;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 500;
+  }
+  .footer-note .accent { color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div>
+      <h1>NFL <span class="accent">Key Numbers</span></h1>
+      <div class="sub">Frequency of margins of victory and total points across NFL history</div>
+    </div>
+    <div class="meta">
+      <div><b id="gameCount" class="num">—</b> games</div>
+      <div id="seasonRange">—</div>
+    </div>
+  </header>
+
+  <!-- Filters -->
+  <div class="filters">
+    <div class="filter-group">
+      <div class="label">
+        <span id="seasonLabelTitle">Season Range</span>
+        <span class="val" id="seasonValLabel">—</span>
+      </div>
+      <div class="range-slider" id="seasonSlider">
+        <div class="track"></div>
+        <div class="fill" id="seasonFill"></div>
+        <input type="range" id="seasonMin">
+        <input type="range" id="seasonMax">
+      </div>
+      <div class="range-slider" id="seasonSliderB" style="display:none; margin-top:10px;">
+        <div class="track"></div>
+        <div class="fill" id="seasonFillB" style="background: var(--period-b);"></div>
+        <input type="range" id="seasonMinB">
+        <input type="range" id="seasonMaxB">
+      </div>
+    </div>
+
+    <div class="filter-group">
+      <div class="label">
+        <span>Spread Range (absolute)</span>
+        <span class="val" id="spreadValLabel">—</span>
+      </div>
+      <div class="range-slider" id="spreadSlider">
+        <div class="track"></div>
+        <div class="fill" id="spreadFill"></div>
+        <input type="range" id="spreadMin">
+        <input type="range" id="spreadMax">
+      </div>
+    </div>
+
+    <div class="filter-group">
+      <div class="label">
+        <span>Game Type</span>
+        <span class="val">&nbsp;</span>
+      </div>
+      <div class="pills" id="gameTypePills">
+        <button data-val="all" class="active">All</button>
+        <button data-val="reg">Regular</button>
+        <button data-val="post">Postseason</button>
+      </div>
+    </div>
+
+    <div class="filter-group">
+      <div class="label">
+        <span>Compare Periods</span>
+        <span class="val">&nbsp;</span>
+      </div>
+      <div class="compare-toggle" id="compareToggle">
+        <div class="switch"></div>
+        <span id="compareLabel">Off</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- View tabs -->
+  <div class="view-tabs" id="viewTabs">
+    <button data-view="margin" class="active">Margin of Victory</button>
+    <button data-view="total">Total Points</button>
+  </div>
+
+  <!-- Stats strip -->
+  <div class="stats" id="statsStrip"></div>
+
+  <!-- Chart + top list -->
+  <div class="layout">
+    <div class="chart-section">
+      <div class="chart-header">
+        <div>
+          <div class="chart-title" id="chartTitle">Margin of Victory Distribution</div>
+        </div>
+        <div class="chart-sub" id="chartSub">Hover for details</div>
+      </div>
+      <div class="legend" id="legend"></div>
+      <div class="chart-wrap">
+        <svg class="chart" id="chart"></svg>
+        <div class="tooltip" id="tooltip"></div>
+      </div>
+    </div>
+
+    <div class="top-list">
+      <h3 id="topListTitle">Most Frequent</h3>
+      <div id="topList"></div>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    Data via <span class="accent">nflverse</span> · 1999–2025 · Margin = |home − away| · Total = home + away
+  </div>
+</div>
+
+<script>
+// ============================================================
+// Embedded dataset (1999–2025 NFL games)
+// Will be replaced by GitHub Action when nflverse releases new data
+// ============================================================
+__DATA_PLACEHOLDER__
+
+// ============================================================
+// State
+// ============================================================
+let DATA = [];
+let MIN_SEASON = 1999, MAX_SEASON = 2025;
+const MAX_SPREAD = 21;
+
+const state = {
+  seasonMin: 1999,
+  seasonMax: 2025,
+  seasonMinB: 1999,
+  seasonMaxB: 2025,
+  spreadMin: 0,
+  spreadMax: 21,
+  gameType: 'all',
+  view: 'margin',
+  compare: false,
+};
+
+// Common margin key numbers in football betting
+const SPREAD_KEYS = new Set([3, 7, 6, 10, 14]);
+// Common totals key numbers
+const TOTAL_KEYS = new Set([41, 37, 44, 51, 47, 43]);
+
+// ============================================================
+// Boot
+// ============================================================
+function boot() {
+  DATA = EMBEDDED_DATA;
+  const seasons = DATA.map(r => r[0]);
+  MIN_SEASON = Math.min(...seasons);
+  MAX_SEASON = Math.max(...seasons);
+  state.seasonMin = MIN_SEASON;
+  state.seasonMax = MAX_SEASON;
+  // Default period B: most recent ~10 seasons
+  const split = MAX_SEASON - 10;
+  state.seasonMinB = Math.max(MIN_SEASON, split + 1);
+  state.seasonMaxB = MAX_SEASON;
+
+  initFilters();
+  render();
+}
+
+// ============================================================
+// Filters
+// ============================================================
+function initFilters() {
+  const sMin = document.getElementById('seasonMin');
+  const sMax = document.getElementById('seasonMax');
+  sMin.min = MIN_SEASON; sMin.max = MAX_SEASON; sMin.value = MIN_SEASON; sMin.step = 1;
+  sMax.min = MIN_SEASON; sMax.max = MAX_SEASON; sMax.value = MAX_SEASON; sMax.step = 1;
+
+  // For default Period A in compare mode: split point
+  const splitDefault = MAX_SEASON - 10;
+  const onSeasonA = () => {
+    let lo = +sMin.value, hi = +sMax.value;
+    if (lo > hi) { [lo, hi] = [hi, lo]; }
+    state.seasonMin = lo;
+    state.seasonMax = hi;
+    updateSeasonUI();
+    render();
+  };
+  sMin.addEventListener('input', onSeasonA);
+  sMax.addEventListener('input', onSeasonA);
+
+  // Period B slider (hidden until compare on)
+  const sMinB = document.getElementById('seasonMinB');
+  const sMaxB = document.getElementById('seasonMaxB');
+  sMinB.min = MIN_SEASON; sMinB.max = MAX_SEASON; sMinB.value = state.seasonMinB; sMinB.step = 1;
+  sMaxB.min = MIN_SEASON; sMaxB.max = MAX_SEASON; sMaxB.value = state.seasonMaxB; sMaxB.step = 1;
+
+  const onSeasonB = () => {
+    let lo = +sMinB.value, hi = +sMaxB.value;
+    if (lo > hi) { [lo, hi] = [hi, lo]; }
+    state.seasonMinB = lo;
+    state.seasonMaxB = hi;
+    updateSeasonUI();
+    render();
+  };
+  sMinB.addEventListener('input', onSeasonB);
+  sMaxB.addEventListener('input', onSeasonB);
+
+  // Spread slider
+  const pMin = document.getElementById('spreadMin');
+  const pMax = document.getElementById('spreadMax');
+  pMin.min = 0; pMin.max = MAX_SPREAD; pMin.value = 0; pMin.step = 0.5;
+  pMax.min = 0; pMax.max = MAX_SPREAD; pMax.value = MAX_SPREAD; pMax.step = 0.5;
+
+  const onSpread = () => {
+    let lo = +pMin.value, hi = +pMax.value;
+    if (lo > hi) { [lo, hi] = [hi, lo]; }
+    state.spreadMin = lo;
+    state.spreadMax = hi;
+    updateSpreadUI();
+    render();
+  };
+  pMin.addEventListener('input', onSpread);
+  pMax.addEventListener('input', onSpread);
+
+  document.querySelectorAll('#gameTypePills button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#gameTypePills button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      state.gameType = btn.dataset.val;
+      render();
+    });
+  });
+
+  document.querySelectorAll('#viewTabs button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#viewTabs button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      state.view = btn.dataset.view;
+      render();
+    });
+  });
+
+  // Compare toggle
+  document.getElementById('compareToggle').addEventListener('click', () => {
+    state.compare = !state.compare;
+    document.getElementById('compareToggle').classList.toggle('on', state.compare);
+    document.getElementById('compareLabel').textContent = state.compare ? 'On' : 'Off';
+    document.getElementById('seasonSliderB').style.display = state.compare ? 'block' : 'none';
+    document.getElementById('seasonLabelTitle').textContent = state.compare ? 'Period A vs B' : 'Season Range';
+    // When turning compare on the first time, suggest a split
+    if (state.compare) {
+      const split = Math.floor((MIN_SEASON + MAX_SEASON) / 2);
+      state.seasonMin = MIN_SEASON;
+      state.seasonMax = split;
+      state.seasonMinB = split + 1;
+      state.seasonMaxB = MAX_SEASON;
+      sMin.value = state.seasonMin; sMax.value = state.seasonMax;
+      sMinB.value = state.seasonMinB; sMaxB.value = state.seasonMaxB;
+    } else {
+      state.seasonMin = MIN_SEASON;
+      state.seasonMax = MAX_SEASON;
+      sMin.value = state.seasonMin; sMax.value = state.seasonMax;
+    }
+    updateSeasonUI();
+    render();
+  });
+
+  updateSeasonUI();
+  updateSpreadUI();
+}
+
+function updateSeasonUI() {
+  const range = MAX_SEASON - MIN_SEASON;
+  if (state.compare) {
+    document.getElementById('seasonValLabel').textContent =
+      `A: ${state.seasonMin}–${state.seasonMax}  B: ${state.seasonMinB}–${state.seasonMaxB}`;
+  } else {
+    document.getElementById('seasonValLabel').textContent = `${state.seasonMin}–${state.seasonMax}`;
+  }
+  const fill = document.getElementById('seasonFill');
+  const left = ((state.seasonMin - MIN_SEASON) / range) * 100;
+  const right = ((state.seasonMax - MIN_SEASON) / range) * 100;
+  fill.style.left = left + '%';
+  fill.style.width = (right - left) + '%';
+
+  const fillB = document.getElementById('seasonFillB');
+  const leftB = ((state.seasonMinB - MIN_SEASON) / range) * 100;
+  const rightB = ((state.seasonMaxB - MIN_SEASON) / range) * 100;
+  fillB.style.left = leftB + '%';
+  fillB.style.width = (rightB - leftB) + '%';
+}
+
+function updateSpreadUI() {
+  const fmt = v => (v === MAX_SPREAD ? `${v}+` : v.toString());
+  document.getElementById('spreadValLabel').textContent = `${fmt(state.spreadMin)} – ${fmt(state.spreadMax)}`;
+  const fill = document.getElementById('spreadFill');
+  const left = (state.spreadMin / MAX_SPREAD) * 100;
+  const right = (state.spreadMax / MAX_SPREAD) * 100;
+  fill.style.left = left + '%';
+  fill.style.width = (right - left) + '%';
+}
+
+// ============================================================
+// Filtering + binning
+// ============================================================
+function getFiltered(seasonLo, seasonHi) {
+  return DATA.filter(r => {
+    const [season, gt, , , spread] = r;
+    if (season < seasonLo || season > seasonHi) return false;
+    if (state.gameType === 'reg' && gt !== 0) return false;
+    if (state.gameType === 'post' && gt !== 1) return false;
+    if (state.spreadMax === MAX_SPREAD) {
+      if (spread < state.spreadMin) return false;
+    } else {
+      if (spread < state.spreadMin || spread > state.spreadMax) return false;
+    }
+    return true;
+  });
+}
+
+function buildHistogram(filtered, valueIdx, range) {
+  const counts = new Map();
+  for (let v = range[0]; v <= range[1]; v++) counts.set(v, 0);
+  for (const r of filtered) {
+    const v = r[valueIdx];
+    if (v >= range[0] && v <= range[1]) counts.set(v, (counts.get(v) || 0) + 1);
+  }
+  const total = filtered.length;
+  const out = [];
+  for (let v = range[0]; v <= range[1]; v++) {
+    const c = counts.get(v) || 0;
+    out.push({ value: v, count: c, pct: total > 0 ? (c / total) * 100 : 0 });
+  }
+  return out;
+}
+
+// ============================================================
+// Rendering
+// ============================================================
+function render() {
+  const filteredA = getFiltered(state.seasonMin, state.seasonMax);
+  const filteredB = state.compare ? getFiltered(state.seasonMinB, state.seasonMaxB) : null;
+
+  const totalGames = filteredA.length + (filteredB?.length || 0);
+  document.getElementById('gameCount').textContent = totalGames.toLocaleString();
+  if (state.compare) {
+    document.getElementById('seasonRange').textContent =
+      `${state.seasonMin}–${state.seasonMax} & ${state.seasonMinB}–${state.seasonMaxB}`;
+  } else {
+    document.getElementById('seasonRange').textContent = `${state.seasonMin}–${state.seasonMax}`;
+  }
+
+  const valIdx = state.view === 'margin' ? 2 : 3;
+  const range = state.view === 'margin' ? [0, 28] : [10, 75];
+  const keyNums = state.view === 'margin' ? SPREAD_KEYS : TOTAL_KEYS;
+  const xTitle = state.view === 'margin' ? 'Margin of Victory (points)' : 'Total Points (combined)';
+
+  document.getElementById('chartTitle').textContent =
+    state.view === 'margin' ? 'Margin of Victory Distribution' : 'Total Points Distribution';
+
+  const histA = buildHistogram(filteredA, valIdx, range);
+  const histB = filteredB ? buildHistogram(filteredB, valIdx, range) : null;
+
+  document.getElementById('chartSub').textContent = state.compare
+    ? `n(A) = ${filteredA.length.toLocaleString()} · n(B) = ${filteredB.length.toLocaleString()}`
+    : `n = ${filteredA.length.toLocaleString()}`;
+
+  renderLegend();
+  renderStats(histA, filteredA, histB, filteredB);
+  drawBarChart(histA, histB, { keyNums, xTitle });
+  renderTopList(histA, histB);
+}
+
+function renderLegend() {
+  const el = document.getElementById('legend');
+  if (state.compare) {
+    el.innerHTML = `
+      <span class="item"><span class="swatch" style="background:var(--period-a)"></span>Period A · ${state.seasonMin}–${state.seasonMax}</span>
+      <span class="item"><span class="swatch" style="background:var(--period-b)"></span>Period B · ${state.seasonMinB}–${state.seasonMaxB}</span>
+    `;
+  } else {
+    el.innerHTML = `<span class="item"><span class="swatch" style="background:var(--green)"></span>Traditional Key Number</span>`;
+  }
+}
+
+function renderStats(histA, filteredA, histB, filteredB) {
+  const mode = state.view;
+  const labels = mode === 'margin'
+    ? ['Most Common Margin', 'Top 3 Combined', 'Median', 'Sample']
+    : ['Most Common Total', 'Top 3 Combined', 'Median', 'Sample'];
+
+  function statsFor(hist, total) {
+    const sorted = [...hist].sort((a, b) => b.count - a.count);
+    const top1 = sorted[0] || { value: '—', count: 0, pct: 0 };
+    const top3 = sorted.slice(0, 3);
+    const top3Sum = top3.reduce((s, d) => s + d.count, 0);
+    const top3Pct = total > 0 ? (top3Sum / total * 100) : 0;
+    let median = '—';
+    if (total > 0) {
+      let cum = 0; const half = total / 2;
+      const sortedByVal = [...hist].sort((a, b) => a.value - b.value);
+      for (const d of sortedByVal) { cum += d.count; if (cum >= half) { median = d.value; break; } }
+    }
+    return { top1, top3Label: top3.map(d => d.value).join(', '), top3Pct, median, total };
+  }
+
+  const sA = statsFor(histA, filteredA.length);
+  const sB = histB ? statsFor(histB, filteredB.length) : null;
+
+  let html = '';
+  if (!state.compare) {
+    const stats = [
+      { label: labels[0], value: sA.top1.value, pct: sA.top1.pct.toFixed(1) + '%' },
+      { label: labels[1], value: sA.top3Label, pct: sA.top3Pct.toFixed(1) + '%' },
+      { label: labels[2], value: sA.median, pct: null },
+      { label: labels[3], value: sA.total.toLocaleString(), pct: null },
+    ];
+    html = stats.map(s => `
+      <div class="stat">
+        <div class="stat-label">${s.label}</div>
+        <div class="stat-value">${s.value}${s.pct ? `<span class="pct">${s.pct}</span>` : ''}</div>
+      </div>
+    `).join('');
+  } else {
+    // Comparison: each stat shows A then B
+    const items = [
+      { label: labels[0], a: `${sA.top1.value} <span class="pct">${sA.top1.pct.toFixed(1)}%</span>`, b: `${sB.top1.value} <span class="pct">${sB.top1.pct.toFixed(1)}%</span>` },
+      { label: labels[1], a: `${sA.top3Label} <span class="pct">${sA.top3Pct.toFixed(1)}%</span>`, b: `${sB.top3Label} <span class="pct">${sB.top3Pct.toFixed(1)}%</span>` },
+      { label: labels[2], a: sA.median, b: sB.median },
+      { label: labels[3], a: sA.total.toLocaleString(), b: sB.total.toLocaleString() },
+    ];
+    html = items.map(s => `
+      <div class="stat">
+        <div class="stat-label">${s.label}</div>
+        <div class="stat-row-2">
+          <div class="stat-line"><span class="lbl" style="color:var(--period-a);">A</span><span class="val">${s.a}</span></div>
+          <div class="stat-line"><span class="lbl" style="color:var(--period-b);">B</span><span class="val">${s.b}</span></div>
+        </div>
+      </div>
+    `).join('');
+  }
+  document.getElementById('statsStrip').innerHTML = html;
+}
+
+// ============================================================
+// SVG bar chart with smart label collision avoidance
+// ============================================================
+function drawBarChart(dataA, dataB, opts) {
+  const svg = document.getElementById('chart');
+  svg.innerHTML = '';
+
+  const W = svg.clientWidth || 900;
+  const H = 460;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+
+  const M = { top: 32, right: 12, bottom: 56, left: 48 };
+  const innerW = W - M.left - M.right;
+  const innerH = H - M.top - M.bottom;
+
+  const allPcts = [...dataA.map(d => d.pct), ...(dataB ? dataB.map(d => d.pct) : [])];
+  const maxPct = Math.max(...allPcts, 1);
+  const yMax = niceCeil(maxPct);
+
+  const n = dataA.length;
+  const groupW = innerW / n;
+  const groupGap = Math.max(1, groupW * 0.16);
+  const groupInner = groupW - groupGap;
+  const isCompare = !!dataB;
+  const barW = isCompare ? groupInner / 2 - 1 : groupInner;
+
+  // Y axis grid + labels
+  const ticks = 5;
+  for (let i = 0; i <= ticks; i++) {
+    const y = M.top + innerH - (innerH * i / ticks);
+    const v = (yMax * i / ticks);
+    const line = svgEl('line', {
+      x1: M.left, x2: M.left + innerW, y1: y, y2: y,
+      class: 'grid-line' + (i === 0 ? ' zero' : '')
+    });
+    svg.appendChild(line);
+    svg.appendChild(svgEl('text', {
+      x: M.left - 8, y: y + 3, 'text-anchor': 'end', class: 'axis-label'
+    }, v.toFixed(v < 1 ? 1 : 0) + '%'));
+  }
+
+  // Y axis title
+  svg.appendChild(svgEl('text', {
+    x: -(M.top + innerH / 2), y: 14,
+    transform: 'rotate(-90)', 'text-anchor': 'middle', class: 'axis-title'
+  }, '% of Games'));
+
+  const tooltip = document.getElementById('tooltip');
+
+  // Collect labeled bar positions for collision detection
+  // We'll only show labels on top key-number bars + the highest non-key bars,
+  // and de-collide them via vertical offset
+  const labelCandidates = [];
+
+  function addBar(d, idx, dataset, color, isKey, isCompareSeries, dB) {
+    const h = (d.pct / yMax) * innerH;
+    let x = M.left + idx * groupW + groupGap / 2;
+    if (isCompareSeries) {
+      x += dataset === 'b' ? barW + 2 : 0;
+    }
+    const y = M.top + innerH - h;
+
+    const rect = svgEl('rect', {
+      x, y, width: Math.max(0.5, barW), height: Math.max(0.5, h),
+      class: 'bar', fill: color
+    });
+    rect.addEventListener('mousemove', e => {
+      const wrap = svg.parentElement;
+      const r = wrap.getBoundingClientRect();
+      tooltip.style.left = Math.min(e.clientX - r.left + 12, r.width - 200) + 'px';
+      tooltip.style.top = (e.clientY - r.top - 12) + 'px';
+      tooltip.classList.add('visible');
+      let html = `<div class="tt-num">${d.value}</div>`;
+      if (isCompareSeries) {
+        const otherD = dB;
+        html += `
+          <div class="tt-row"><span class="tt-period-tag" style="background:var(--period-a)"></span>A: <b>${d.count.toLocaleString()}</b> · <b>${d.pct.toFixed(2)}%</b></div>
+          <div class="tt-row"><span class="tt-period-tag" style="background:var(--period-b)"></span>B: <b>${otherD.count.toLocaleString()}</b> · <b>${otherD.pct.toFixed(2)}%</b></div>
+        `;
+      } else {
+        html += `
+          <div class="tt-row"><b>${d.count.toLocaleString()}</b> games</div>
+          <div class="tt-row"><b>${d.pct.toFixed(2)}%</b> of sample</div>
+        `;
+      }
+      tooltip.innerHTML = html;
+    });
+    rect.addEventListener('mouseleave', () => tooltip.classList.remove('visible'));
+    svg.appendChild(rect);
+
+    if (isKey && d.pct > 0) {
+      labelCandidates.push({
+        x: x + barW / 2,
+        y: y - 5,
+        value: d.value,
+        pct: d.pct,
+        text: d.pct.toFixed(1) + '%',
+        priority: 2, // key number
+        width: estimateTextWidth(d.pct.toFixed(1) + '%', 10)
+      });
+    }
+  }
+
+  // Determine bar colors per dataset
+  function colorForBar(d, isKey, isB) {
+    if (isCompare) return isB ? 'var(--period-b)' : 'var(--period-a)';
+    if (isKey) return 'var(--green)';
+    const intensity = Math.max(0.32, Math.min(1, d.pct / yMax));
+    return `rgba(0, 195, 88, ${intensity})`;
+  }
+
+  dataA.forEach((d, i) => {
+    const isKey = opts.keyNums.has(d.value);
+    const dB = dataB ? dataB[i] : null;
+    addBar(d, i, 'a', colorForBar(d, isKey, false), isKey, isCompare, dB);
+    if (dB) {
+      addBar(dB, i, 'b', colorForBar(dB, isKey, true), isKey, isCompare, d);
+    }
+  });
+
+  // ====== Smart label placement ======
+  // Sort labels by x position; resolve collisions by hiding lower-priority overlaps
+  // For totals view especially, drop every-other label if close
+  labelCandidates.sort((a, b) => a.x - b.x);
+  const placed = [];
+  const minGap = 4;
+  for (const cand of labelCandidates) {
+    const left = cand.x - cand.width / 2;
+    const right = cand.x + cand.width / 2;
+    let collides = false;
+    for (const p of placed) {
+      if (left < p.right + minGap && right > p.left - minGap) {
+        // overlaps. Keep the one with higher pct (or earlier priority)
+        if (cand.pct > p.pct) {
+          // remove p, then add cand
+          p.skip = true;
+        } else {
+          collides = true;
+        }
+      }
+    }
+    if (!collides) placed.push({ ...cand, left, right });
+  }
+
+  for (const p of placed) {
+    if (p.skip) continue;
+    svg.appendChild(svgEl('text', {
+      x: p.x, y: p.y, 'text-anchor': 'middle', class: 'bar-label'
+    }, p.text));
+  }
+
+  // X axis labels: always show key numbers, then space-fill others
+  // Priority: key numbers > top non-key (by pct) > everything else
+  const xLabelMinGap = 18; // px
+  const xLabelCandidates = dataA.map((d, i) => ({
+    x: M.left + i * groupW + groupW / 2,
+    value: d.value,
+    isKey: opts.keyNums.has(d.value),
+    pct: d.pct
+  }));
+  xLabelCandidates.sort((a, b) => {
+    // higher priority: keys first, then by pct
+    if (a.isKey !== b.isKey) return a.isKey ? -1 : 1;
+    return b.pct - a.pct;
+  });
+
+  const placedX = [];
+  for (const c of xLabelCandidates) {
+    let collides = false;
+    for (const p of placedX) {
+      if (Math.abs(c.x - p.x) < xLabelMinGap) { collides = true; break; }
+    }
+    if (!collides) placedX.push(c);
+  }
+
+  for (const c of placedX) {
+    svg.appendChild(svgEl('text', {
+      x: c.x, y: M.top + innerH + 16,
+      'text-anchor': 'middle',
+      class: 'axis-label' + (c.isKey ? ' key' : '')
+    }, c.value));
+  }
+
+  // X axis title
+  svg.appendChild(svgEl('text', {
+    x: M.left + innerW / 2, y: H - 10,
+    'text-anchor': 'middle', class: 'axis-title'
+  }, opts.xTitle));
+}
+
+function estimateTextWidth(text, fontSize) {
+  // rough heuristic: 0.55em per char in Inter
+  return text.length * fontSize * 0.55;
+}
+
+function niceCeil(v) {
+  // round up to a "nice" max for axes
+  if (v <= 1) return Math.ceil(v * 10) / 10;
+  if (v <= 5) return Math.ceil(v);
+  if (v <= 10) return Math.ceil(v / 2) * 2;
+  return Math.ceil(v / 5) * 5;
+}
+
+function svgEl(name, attrs, text) {
+  const el = document.createElementNS('http://www.w3.org/2000/svg', name);
+  for (const k in attrs) el.setAttribute(k, attrs[k]);
+  if (text != null) el.textContent = text;
+  return el;
+}
+
+// ============================================================
+// Top list — DataGolf-style inline mini bars
+// ============================================================
+function renderTopList(histA, histB) {
+  const sortedA = [...histA].sort((a, b) => b.count - a.count).slice(0, 10);
+  const maxA = sortedA[0]?.pct || 1;
+
+  document.getElementById('topListTitle').textContent =
+    state.compare ? 'Most Frequent · A vs B' : 'Most Frequent';
+
+  if (!state.compare) {
+    const html = sortedA.map((d, i) => `
+      <div class="top-row">
+        <div class="top-rank num">${(i + 1).toString().padStart(2,'0')}</div>
+        <div class="top-num num">${d.value}</div>
+        <div class="top-mini-bar"><div class="top-mini-bar-fill" style="width:${(d.pct / maxA) * 100}%"></div></div>
+        <div class="top-pct num">${d.pct.toFixed(1)}%</div>
+      </div>
+    `).join('');
+    document.getElementById('topList').innerHTML = html;
+  } else {
+    // Show top 10 by combined freq, with paired mini-bars
+    const map = new Map();
+    histA.forEach(d => map.set(d.value, { value: d.value, a: d, b: null }));
+    histB.forEach(d => {
+      if (map.has(d.value)) map.get(d.value).b = d;
+      else map.set(d.value, { value: d.value, a: { count: 0, pct: 0 }, b: d });
+    });
+    const merged = [...map.values()].sort((x, y) => (y.a.pct + (y.b?.pct || 0)) - (x.a.pct + (x.b?.pct || 0))).slice(0, 10);
+    const maxBoth = Math.max(...merged.map(m => Math.max(m.a.pct, m.b?.pct || 0)), 1);
+
+    const html = merged.map((m, i) => `
+      <div class="top-row cmp">
+        <div class="top-rank num">${(i + 1).toString().padStart(2,'0')}</div>
+        <div class="top-num num">${m.value}</div>
+        <div class="top-mini-stack">
+          <div class="mini-line a">
+            <div class="lbl"><span style="width:${(m.a.pct / maxBoth) * 100}%; background:var(--period-a);"></span></div>
+            <div class="val num">${m.a.pct.toFixed(1)}%</div>
+          </div>
+          <div class="mini-line b">
+            <div class="lbl"><span style="width:${((m.b?.pct || 0) / maxBoth) * 100}%; background:var(--period-b);"></span></div>
+            <div class="val num">${(m.b?.pct || 0).toFixed(1)}%</div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    `).join('');
+    document.getElementById('topList').innerHTML = html;
+  }
+}
+
+// ============================================================
+// Boot when fonts load
+// ============================================================
+if (document.fonts && document.fonts.ready) {
+  document.fonts.ready.then(boot);
+} else {
+  boot();
+}
+
+let resizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => { if (DATA.length) render(); }, 100);
+});
+</script>
+</body>
+</html>
